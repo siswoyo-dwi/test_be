@@ -4,10 +4,16 @@ const dayjs = require('dayjs');
 const customParseFormat = require('dayjs/plugin/customParseFormat');
 dayjs.extend(customParseFormat);
 const moment = require('moment');
+const express = require('express');
+const multer = require('multer');
 
-const workbook = XLSX.readFile('./detailed_ddos_logs_6_months.csv'); 
-const sheet = workbook.Sheets[workbook.SheetNames[0]];
-const rows = XLSX.utils.sheet_to_json(sheet);
+
+const router = express.Router();
+
+const upload = multer({ dest: 'uploads/' });
+
+
+
 
 const client = new Client({
     user: 'postgres',
@@ -16,6 +22,7 @@ const client = new Client({
     port: 8485,
     database:'api',
 });
+ client.connect();
 
 // Fungsi untuk menangani konversi serial date Excel menjadi tanggal
 function parseDate(dateValue,plus,tipe) {
@@ -45,55 +52,102 @@ function parseDate(dateValue,plus,tipe) {
       return null;
     }
   }
-  
-  
-  
-async function importVulnerabilities() {
-  await client.connect();
-
-  for (const row of rows) {
-    console.log(row['Timestamp']);
-    
-    const timestamp = parseDate(row['Timestamp'],1); 
-
-console.log(timestamp);
-
-    await client.query(`
-      INSERT INTO vapt_findings_log (
-        finding_id, timestamp, asset_name,
-        vulnerability_type, severity, description,
-        remediation_status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-    `, [
-      row['Finding ID'],
-      timestamp,
-      row['Asset Name'],
-      row['Vulnerability Type'],
-      row['Severity'],
-      row['Description'],
-      row['Remediation Status']
-    ]);
+  function parseChange(value) {
+    if (typeof value === 'string') {
+      return parseFloat(value.replace('%', '').replace(',', '.'));
+    }
+    return value;
   }
-
-  console.log('✅ Import selesai ke tabel vulnerabilities!');
-  await client.end();
-}
-
-// importVulnerabilities().catch(console.error);
-
-function parsePercent(value) {
-  if (typeof value === 'string') {
-    return parseFloat(value.replace('%', '').replace(',', '.'));
+  function parsePercent(value) {
+    if (typeof value === 'string') {
+      return parseFloat(value.replace('%', '').replace(',', '.'));
+    }
+    return value;
   }
-  return value;
-}
+  function parseBandwidth(val) {
+    return parseFloat(val.toString().replace(',', '.'));
+  }
+  
+  function parseTimestamp(ts) {
+    return moment(ts, 'M/D/YY H:mm').format('YYYY-MM-DD HH:mm:ss');
+  }
+  router.post('/active_breach_logs', upload.single('file'), async (req, res) => {
+    const workbook = XLSX.readFile(req.file.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+    try {
+      for (const row of rows) {
+        await client.query(`
+          INSERT INTO events (
+            timestamp, event_id, source_ip, destination_ip,
+            event_type, severity, asset_name, breach_type,
+            action_taken, status
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        `, [
+          new Date(row['Timestamp']),
+          row['Event ID'],
+          row['Source IP'],
+          row['Destination IP'],
+          row['Event Type'],
+          row['Severity'],
+          row['Asset Name'],
+          row['Breach Type'],
+          row['Action Taken'],
+          row['Status']
+        ]);
+      }
+      res.json({ status:200,message: 'Upload and import complete.' });
 
-async function importSystemHardening() {
-  await client.connect();
+    } catch (error) {
+      res.status(500).json({ error: 'Upload failed.' });
 
-  for (const row of rows) {
-    console.log(rows);
+    }
+
+})
+  router.post('/vapt_findings_log', upload.single('file'), async (req, res) => {
+    const workbook = XLSX.readFile(req.file.path);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet);
+    try {
+      for (const row of rows) {
+        console.log(row['Timestamp']);
+        
+        const timestamp = parseDate(row['Timestamp'],1); 
+        await client.query(`
+          INSERT INTO vapt_findings_log (
+            finding_id, timestamp, asset_name,
+            vulnerability_type, severity, description,
+            remediation_status
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [
+          row['Finding ID'],
+          timestamp,
+          row['Asset Name'],
+          row['Vulnerability Type'],
+          row['Severity'],
+          row['Description'],
+          row['Remediation Status']
+        ]);
+      }
+      res.json({ status:200,message: 'Upload and import complete.' });
+
+    } catch (error) {
+      res.status(500).json({ error: 'Upload failed.' });
+
+    }
+
+})
+
+
+
+router.post('/system_level_hardening_data', upload.single('file'), async (req, res) => {
+  const workbook = XLSX.readFile(req.file.path);
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet);
+  try {
     
+
+  for (const row of rows) {    
     await client.query(`
       INSERT INTO system_level_hardening_data (
         system_name,
@@ -114,23 +168,24 @@ async function importSystemHardening() {
       parsePercent(row['Automation Coverage (%)'])
     ]);
   }
+    res.json({ status:200,message: 'Upload and import complete.' });
 
-  console.log('✅ Import system hardening data selesai!');
-  await client.end();
-}
+  } catch (error) {
+    res.status(500).json({ error: 'Upload failed.' });
 
-function parseChange(value) {
-  if (typeof value === 'string') {
-    return parseFloat(value.replace('%', '').replace(',', '.'));
   }
-  return value;
-}
-async function importSummaryMetrics() {
-  await client.connect();
+})
+
+
+router.post('/system_hardening_summary', upload.single('file'), async (req, res) => {
+  const workbook = XLSX.readFile(req.file.path);
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet);
+  try {
 
   for (const row of rows) {
     await client.query(`
-      INSERT INTO system_hardening_metrics (
+      INSERT INTO system_hardening_summary (
         metric,
         current_value,
         target_value,
@@ -143,27 +198,24 @@ async function importSummaryMetrics() {
       parseChange(row['Change From Last Month'])
     ]);
   }
+  res.json({ status:200,message: 'Upload and import complete.' });
 
-  console.log('✅ Import hardening metrics selesai!');
-  await client.end();
-}
+  } catch (error) {
+    res.status(500).json({ error: 'Upload failed.' });
 
-// importSummaryMetrics().catch(console.error);
+  }
+})
 
-function parseBandwidth(val) {
-  return parseFloat(val.toString().replace(',', '.'));
-}
 
-function parseTimestamp(ts) {
-  return moment(ts, 'M/D/YY H:mm').format('YYYY-MM-DD HH:mm:ss');
-}
 
-async function importDdosLogs() {
-  await client.connect();
-  for (const row of rows) {
-      
-    console.log(row['Timestamp']);
+router.post('/ddos_attack_logs', upload.single('file'), async (req, res) => {
+  const workbook = XLSX.readFile(req.file.path);
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet);
+  try {
     
+  for (const row of rows) {
+          
     await client.query(`
       INSERT INTO ddos_attack_logs (
         month,
@@ -186,8 +238,11 @@ async function importDdosLogs() {
       row['Status']
     ]);
   }
-  console.log('✅ Import DDoS logs selesai!');
-  await client.end();
-}
+  res.json({ status:200,message: 'Upload and import complete.' });
 
-importDdosLogs().catch(console.error);
+  } catch (error) {
+    res.status(500).json({ error: 'Upload failed.' });
+
+  }
+})
+module.exports = router;

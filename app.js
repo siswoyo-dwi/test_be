@@ -1,12 +1,15 @@
 const express = require('express');
 const { Client } = require('pg');
 const cors = require('cors');
-const authentification = require('./authentification'); 
 
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
+app.use(express.json());
+
+const uploadRoute = require('./uploadExcel.js'); 
+app.use('/upload', uploadRoute);
 
 const client = new Client({
     user: 'postgres',
@@ -18,7 +21,7 @@ const client = new Client({
 
 client.connect();
 
-app.get('/api/event', authentification,async (req, res) => {
+app.get('/api/event',async (req, res) => {
   try {
     const result = await client.query(`
       SELECT * FROM events
@@ -30,7 +33,7 @@ app.get('/api/event', authentification,async (req, res) => {
   }
 });
 
-app.get('/api/event/summary',authentification, async (req, res) => {
+app.get('/api/event/summary',async (req, res) => {
   try {
     const activeResult = await client.query(`
       SELECT COUNT(*) AS active_count FROM events WHERE status ILIKE 'active'
@@ -53,7 +56,7 @@ app.get('/api/event/summary',authentification, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-app.get('/api/vapt_findings_log', authentification,async (req, res) => {
+app.get('/api/vapt_findings_log',async (req, res) => {
   try {
     const result = await client.query(`
       SELECT * FROM vapt_findings_log`);
@@ -62,7 +65,7 @@ app.get('/api/vapt_findings_log', authentification,async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-app.get('/api/vapt_findings_log/summary',authentification, async (req, res) => {
+app.get('/api/vapt_findings_log/summary',async (req, res) => {
   try {
     const activeResult = await client.query(`
       SELECT COUNT(*) AS active_count FROM vapt_findings_log WHERE severity != 'Critical'
@@ -86,7 +89,7 @@ app.get('/api/vapt_findings_log/summary',authentification, async (req, res) => {
   }
 });
 
-app.get('/api/system_level_hardening_data',authentification,async (req, res) => {
+app.get('/api/system_level_hardening_data',async (req, res) => {
   try {
     const result = await client.query(`
       SELECT * FROM system_level_hardening_data`);
@@ -95,7 +98,7 @@ app.get('/api/system_level_hardening_data',authentification,async (req, res) => 
     res.status(500).json({ error: err.message });
   }
 })
-app.get('/api/system_hardening_summary',authentification,async (req, res) => {
+app.get('/api/system_hardening_summary',async (req, res) => {
   try {
     const result = await client.query(`
       SELECT * FROM system_hardening_summary`);
@@ -119,7 +122,7 @@ app.get('/api/system_hardening_summary',authentification,async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-app.get('/api/ddos-attack-stats',authentification, async (req, res) => {
+app.get('/api/ddos-attack-stats',async (req, res) => {
   try {
     const result = await client.query(`
      SELECT 

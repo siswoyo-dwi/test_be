@@ -1,0 +1,13 @@
+System Name,Compliance (%),Drift Count,Critical Drift Count,Remediation Progress (%),Pending Remediation,Automation Coverage (%)
+WebApp-Prod01,75.7%,2,1,73.9%,3,79.1%
+Database-Server01,81.0%,4,3,74.3%,2,63.6%
+Internal-API-Gateway,79.2%,6,1,85.1%,4,78.3%
+HR-Portal-VM,92.2%,3,1,79.6%,2,73.3%
+Finance-Server02,97.7%,3,3,68.6%,4,68.3%
+Customer-Portal,91.7%,4,3,92.8%,0,59.4%
+Mail-Server01,89.8%,2,2,84.6%,3,57.1%
+DevOps-Jenkins01,93.3%,4,0,71.0%,1,58.8%
+VPN-Gateway01,86.3%,1,0,82.9%,5,79.2%
+FileShare-Server,79.2%,4,0,84.9%,1,70.8%
+Backup-Server,87.7%,3,3,76.5%,0,60.0%
+Monitoring-Agent01,97.1%,2,1,79.0%,2,50.4%

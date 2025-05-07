@@ -1,0 +1,4 @@
+Timestamp,Event ID,Source IP,Destination IP,Event Type,Severity,Asset Name,Breach Type,Action Taken,Status
+2025-05-06 14:49:41,EVT-3001,203.0.113.10,10.10.10.20,Unauthorized Access,High,DB-Server-Prod,Credential Stuffing,Blocked,Active
+2025-05-06 14:34:41,EVT-3002,198.51.100.15,10.10.15.12,Suspicious Login,Critical,Core-Firewall,Brute Force Attack,Alert Raised,Active
+2025-05-06 14:19:41,EVT-3003,192.0.2.40,10.10.22.5,Data Exfiltration,Medium,File-Share-01,Suspicious File Transfer,Monitored,Active

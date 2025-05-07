@@ -1,0 +1,25 @@
+Finding ID,Timestamp,Asset Name,Vulnerability Type,Severity,Description,Remediation Status
+VAPT-1000,6/4/25,Database-Server01,Directory Traversal,Critical,"User input is not validated when accessing file paths, allowing access to sensitive files on the server.",Resolved
+VAPT-1001,10/4/25,Finance-Server02,Cross-Site Scripting (XSS),Critical,"The application reflects unsanitized user input in the response, enabling script execution in the user’s browser.",In Progress
+VAPT-1002,6/5/25,HR-Portal-VM,Insecure Deserialization,Critical,Deserialization of untrusted data allows remote code execution or manipulation of application logic.,In Progress
+VAPT-1003,21/4/25,Internal-API-Gateway,Insecure Deserialization,Critical,Deserialization of untrusted data allows remote code execution or manipulation of application logic.,In Progress
+VAPT-1004,13/4/25,Finance-Server02,Broken Access Control,Critical,Improper enforcement of authorization policies enables privilege escalation or access to restricted resources.,Pending
+VAPT-1005,22/4/25,DevOps-Jenkins01,Sensitive Data Exposure,High,Sensitive information such as credit card numbers or credentials is transmitted or stored insecurely.,Pending
+VAPT-1006,26/4/25,FileShare-Server,Directory Traversal,Medium,"User input is not validated when accessing file paths, allowing access to sensitive files on the server.",Resolved
+VAPT-1007,26/4/25,HR-Portal-VM,Directory Traversal,High,"User input is not validated when accessing file paths, allowing access to sensitive files on the server.",Pending
+VAPT-1008,11/4/25,HR-Portal-VM,Directory Traversal,Low,"User input is not validated when accessing file paths, allowing access to sensitive files on the server.",Resolved
+VAPT-1009,13/4/25,DevOps-Jenkins01,Insecure Deserialization,Low,Deserialization of untrusted data allows remote code execution or manipulation of application logic.,Pending
+VAPT-1010,3/5/25,HR-Portal-VM,Cross-Site Scripting (XSS),High,"The application reflects unsanitized user input in the response, enabling script execution in the user’s browser.",In Progress
+VAPT-1011,13/4/25,Mail-Server01,Directory Traversal,Medium,"User input is not validated when accessing file paths, allowing access to sensitive files on the server.",Resolved
+VAPT-1012,28/4/25,WebApp-Prod01,Weak Password Policy,High,"Password policy does not enforce complexity, length, or reuse prevention, increasing the risk of brute-force attacks.",In Progress
+VAPT-1013,20/4/25,Database-Server01,Weak Password Policy,High,"Password policy does not enforce complexity, length, or reuse prevention, increasing the risk of brute-force attacks.",Pending
+VAPT-1014,6/4/25,Database-Server01,Open Redirect,High,"The app redirects users to URLs based on unvalidated input, which can be exploited for phishing attacks.",In Progress
+VAPT-1015,26/4/25,Internal-API-Gateway,Command Injection,Medium,"User input is improperly handled in shell commands, allowing arbitrary command execution on the server.",In Progress
+VAPT-1016,25/4/25,FileShare-Server,Cross-Site Scripting (XSS),Medium,"The application reflects unsanitized user input in the response, enabling script execution in the user’s browser.",Pending
+VAPT-1017,1/5/25,HR-Portal-VM,Command Injection,Medium,"User input is improperly handled in shell commands, allowing arbitrary command execution on the server.",Resolved
+VAPT-1018,7/4/25,VPN-Gateway01,Open Redirect,Medium,"The app redirects users to URLs based on unvalidated input, which can be exploited for phishing attacks.",Pending
+VAPT-1019,23/4/25,VPN-Gateway01,SQL Injection,High,"The application fails to properly sanitize user input in SQL queries, allowing an attacker to manipulate database operations.",In Progress
+VAPT-1020,17/4/25,Database-Server01,Weak Password Policy,Medium,"Password policy does not enforce complexity, length, or reuse prevention, increasing the risk of brute-force attacks.",Resolved
+VAPT-1021,14/4/25,Database-Server01,Unpatched Software,Medium,The system is running outdated software with known vulnerabilities that are exploitable remotely.,Pending
+VAPT-1022,19/4/25,WebApp-Prod01,Cross-Site Scripting (XSS),Medium,"The application reflects unsanitized user input in the response, enabling script execution in the user’s browser.",In Progress
+VAPT-1023,13/4/25,WebApp-Prod01,Cross-Site Scripting (XSS),High,"The application reflects unsanitized user input in the response, enabling script execution in the user’s browser.",Pending
