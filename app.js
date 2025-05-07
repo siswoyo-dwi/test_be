@@ -86,6 +86,15 @@ app.get('/api/vapt_findings_log/summary',authentification, async (req, res) => {
   }
 });
 
+app.get('/api/system_level_hardening_data',authentification,async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT * FROM system_level_hardening_data`);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+})
 app.get('/api/system_hardening_summary',authentification,async (req, res) => {
   try {
     const result = await client.query(`
