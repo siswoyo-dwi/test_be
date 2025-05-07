@@ -10,7 +10,8 @@ app.use(express.json());
 
 const uploadRoute = require('./uploadExcel.js'); 
 app.use('/upload', uploadRoute);
-
+const downloadRoute = require('./download.js'); 
+app.use('/download', downloadRoute);
 const client = new Client({
     user: 'postgres',
     password: 'Grafika9',
