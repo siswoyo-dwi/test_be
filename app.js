@@ -1,0 +1,141 @@
+const express = require('express');
+const { Client } = require('pg');
+const cors = require('cors');
+const authentification = require('./authentification'); 
+
+const app = express();
+const PORT = 3000;
+
+app.use(cors());
+
+const client = new Client({
+    user: 'postgres',
+    password: 'Grafika9',
+    host: 'serova.id',
+    port: 8485,
+    database:'api',
+});
+
+client.connect();
+
+app.get('/api/event', authentification,async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT * FROM events
+      WHERE status ILIKE 'active'
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/event/summary',authentification, async (req, res) => {
+  try {
+    const activeResult = await client.query(`
+      SELECT COUNT(*) AS active_count FROM events WHERE status ILIKE 'active'
+    `);
+
+    const criticalResult = await client.query(`
+      SELECT COUNT(*) AS critical_count FROM events WHERE status ILIKE 'active' AND severity ILIKE 'critical'
+    `);
+
+    const currentActive = parseInt(activeResult.rows[0].active_count);
+        const dropPercent = -15.2
+    res.json({
+      active_breaches: currentActive,
+      lastmonth_compare: dropPercent>0?"up":dropPercent==0?"same":"down",
+      lastmonth_diff:Math.abs(dropPercent),
+      critical_breaches: parseInt(criticalResult.rows[0].critical_count),
+
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.get('/api/vapt_findings_log', authentification,async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT * FROM vapt_findings_log`);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.get('/api/vapt_findings_log/summary',authentification, async (req, res) => {
+  try {
+    const activeResult = await client.query(`
+      SELECT COUNT(*) AS active_count FROM vapt_findings_log WHERE severity != 'Critical'
+    `);
+
+    const criticalResult = await client.query(`
+      SELECT COUNT(*) AS active_count FROM vapt_findings_log WHERE severity = 'Critical'
+    `);
+
+    const currentActive = parseInt(activeResult.rows[0].active_count);
+        const dropPercent = -12.5
+    res.json({
+      active_breaches: currentActive,
+      lastmonth_compare: dropPercent>0?"up":dropPercent==0?"same":"down",
+      lastmonth_diff:Math.abs(dropPercent),
+      critical_breaches: parseInt(criticalResult.rows[0].critical_count),
+
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.get('/api/system_hardening_metrics', authentification,async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT * FROM system_hardening_metrics`);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.get('/api/system_hardening_metrics/summary',authentification,async (req, res) => {
+  try {
+    const result = await client.query(`
+      SELECT * FROM system_hardening_metrics`);
+    let metrics = result.rows
+    const compliance = metrics.find(m => m.metric === 'Overall Compliance');
+    const drift = metrics.find(m => m.metric === 'Configuration Drift');
+    const remediation = metrics.find(m => m.metric === 'Remediation Progress');
+    const automation = metrics.find(m => m.metric === 'Automation Coverage');
+  
+    // Ekstrak angka dari string
+    const driftMatch = drift.current_value.match(/(\d+).*?(\d+)/); // 42 drifts (12 critical)
+    const remediationMatch = remediation.current_value.match(/([\d.]+).*?(\d+)/); // 78.2% (24 pending)
+  
+    let str =  `This is the system hardening test data close to realistic data for:
+  - Overall compliance of ${parseFloat(compliance.current_value.replace(',', '.'))}% with target of ${compliance.target_value}, ${parseFloat(compliance.change_from_last_month) >= 0 ? 'up' : 'down'} ${Math.abs(parseFloat(compliance.change_from_last_month))}%
+  - Configuration drift of ${driftMatch[1]} with ${driftMatch[2]} critical, ${parseFloat(drift.change_from_last_month) >= 0 ? 'up' : 'down'} ${Math.abs(parseFloat(drift.change_from_last_month))}%
+  - Remediation Progress of ${remediationMatch[1]}% with ${remediationMatch[2]} pending, ${parseFloat(remediation.change_from_last_month) >= 0 ? 'up' : 'down'} ${Math.abs(parseFloat(remediation.change_from_last_month))}%
+  - Automation Coverage ${parseFloat(automation.current_value.replace(',', '.'))}%, with target of ${automation.target_value}, ${parseFloat(automation.change_from_last_month) >= 0 ? 'up' : 'down'} ${Math.abs(parseFloat(automation.change_from_last_month))}%`;
+  res.json({res:200,message:'sukses',data:str});
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+app.get('/api/ddos-attack-stats', async (req, res) => {
+  try {
+    const result = await client.query(`
+     SELECT 
+        month,  TO_CHAR("timestamp", 'YYYY-MM') AS get,
+        COUNT(*) AS total_attacks
+      FROM ddos_attack_logs
+      GROUP BY get , month
+      ORDER BY get 
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+app.listen(PORT, () => {
+  console.log(`API server running at http://localhost:${PORT}`);
+});

@@ -1,0 +1,5 @@
+Metric,Current Value,Target Value,Change From Last Month
+Overall Compliance,86.5%,95%,+2.3%
+Configuration Drift,42 drifts (12 critical),0 (Ideal),-8.4%
+Remediation Progress,78.2% (24 pending),100%,+15.6%
+Automation Coverage,67.8%,80%,+5.2%

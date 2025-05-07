@@ -1,5 +1,5 @@
 async function authentification(req, res, next) {
-    try {
+    try {      
       const token = req.headers.authorization?.split(' ')[1];
       const decode = token === 'Fosan132@';
   
