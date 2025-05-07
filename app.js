@@ -85,19 +85,11 @@ app.get('/api/vapt_findings_log/summary',authentification, async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-app.get('/api/system_hardening_metrics', authentification,async (req, res) => {
+
+app.get('/api/system_hardening_summary',authentification,async (req, res) => {
   try {
     const result = await client.query(`
-      SELECT * FROM system_hardening_metrics`);
-    res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-app.get('/api/system_hardening_metrics/summary',authentification,async (req, res) => {
-  try {
-    const result = await client.query(`
-      SELECT * FROM system_hardening_metrics`);
+      SELECT * FROM system_hardening_summary`);
     let metrics = result.rows
     const compliance = metrics.find(m => m.metric === 'Overall Compliance');
     const drift = metrics.find(m => m.metric === 'Configuration Drift');
@@ -107,13 +99,12 @@ app.get('/api/system_hardening_metrics/summary',authentification,async (req, res
     // Ekstrak angka dari string
     const driftMatch = drift.current_value.match(/(\d+).*?(\d+)/); // 42 drifts (12 critical)
     const remediationMatch = remediation.current_value.match(/([\d.]+).*?(\d+)/); // 78.2% (24 pending)
+
   
-    let str =  `This is the system hardening test data close to realistic data for:
-  - Overall compliance of ${parseFloat(compliance.current_value.replace(',', '.'))}% with target of ${compliance.target_value}, ${parseFloat(compliance.change_from_last_month) >= 0 ? 'up' : 'down'} ${Math.abs(parseFloat(compliance.change_from_last_month))}%
-  - Configuration drift of ${driftMatch[1]} with ${driftMatch[2]} critical, ${parseFloat(drift.change_from_last_month) >= 0 ? 'up' : 'down'} ${Math.abs(parseFloat(drift.change_from_last_month))}%
-  - Remediation Progress of ${remediationMatch[1]}% with ${remediationMatch[2]} pending, ${parseFloat(remediation.change_from_last_month) >= 0 ? 'up' : 'down'} ${Math.abs(parseFloat(remediation.change_from_last_month))}%
-  - Automation Coverage ${parseFloat(automation.current_value.replace(',', '.'))}%, with target of ${automation.target_value}, ${parseFloat(automation.change_from_last_month) >= 0 ? 'up' : 'down'} ${Math.abs(parseFloat(automation.change_from_last_month))}%`;
-  res.json({res:200,message:'sukses',data:str});
+  res.json({res:200,message:'sukses',automation_coverage:{automation:parseFloat(automation.current_value.replace(',', '.')),target:automation.target_value,status:parseFloat(automation.change_from_last_month) >= 0 ? 'up' : 'down',point:Math.abs(parseFloat(automation.change_from_last_month))},
+    remediation_progress:{progress:remediationMatch[1],pending:remediationMatch[2],status:parseFloat(drift.change_from_last_month) >= 0 ? 'up' : 'down',point:Math.abs(parseFloat(remediation.change_from_last_month))},
+    configuration_drift:{drift:driftMatch[1],critical:driftMatch[2],status:parseFloat(drift.change_from_last_month) >= 0 ? 'up' : 'down',point:Math.abs(parseFloat(drift.change_from_last_month))},
+    overall_compliance:{compliance:parseFloat(compliance.current_value.replace(',', '.')),target:compliance.target_value,status:parseFloat(compliance.change_from_last_month) >= 0 ? 'up' : 'down'},point:Math.abs(parseFloat(compliance.change_from_last_month))});
 
   } catch (err) {
     res.status(500).json({ error: err.message });
