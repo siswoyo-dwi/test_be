@@ -119,7 +119,7 @@ app.get('/api/system_hardening_metrics/summary',authentification,async (req, res
     res.status(500).json({ error: err.message });
   }
 });
-app.get('/api/ddos-attack-stats', async (req, res) => {
+app.get('/api/ddos-attack-stats',authentification, async (req, res) => {
   try {
     const result = await client.query(`
      SELECT 
