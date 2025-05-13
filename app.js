@@ -1,6 +1,7 @@
 const express = require('express');
 const { Client } = require('pg');
 const cors = require('cors');
+const config = require('./config');
 
 const app = express();
 const PORT = 3000;
@@ -12,13 +13,7 @@ const uploadRoute = require('./uploadExcel.js');
 app.use('/upload', uploadRoute);
 const downloadRoute = require('./download.js'); 
 app.use('/download', downloadRoute);
-const client = new Client({
-    user: 'postgres',
-    password: 'Grafika9',
-    host: 'serova.id',
-    port: 8485,
-    database:'api',
-});
+const client = new Client(config.db);
 
 client.connect();
 
