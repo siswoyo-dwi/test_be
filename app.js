@@ -1,16 +1,21 @@
-const express = require('express');
-const cors = require('cors');
-const client = require('./config');
+import 'dotenv/config'
+import express from 'express';
+import cors from 'cors';
+import client from './config.js';
+import authentification from './authentification.js'; 
+import morgan from 'morgan';
+
 
 const app = express();
 const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
-
-const uploadRoute = require('./uploadExcel.js'); 
+app.use(morgan('combined'))
+app.use(authentification);
+import uploadRoute from './uploadExcel.js'; 
 app.use('/upload', uploadRoute);
-const downloadRoute = require('./download.js'); 
+import downloadRoute from './download.js'; 
 app.use('/download', downloadRoute);
 
 app.get('/api/event',async (req, res) => {

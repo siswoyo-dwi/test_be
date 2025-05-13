@@ -1,11 +1,12 @@
-const XLSX = require('xlsx');
-const { Client } = require('pg');
-const dayjs = require('dayjs');
-const customParseFormat = require('dayjs/plugin/customParseFormat');
+import XLSX from 'xlsx';
+import pkg from 'pg';
+const { Client } = pkg;
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
 dayjs.extend(customParseFormat);
-const moment = require('moment');
-const express = require('express');
-const multer = require('multer');
+import moment from 'moment';
+import express from 'express';
+import multer from 'multer';
 
 
 const router = express.Router();
@@ -245,4 +246,4 @@ router.post('/ddos_attack_logs', upload.single('file'), async (req, res) => {
 
   }
 })
-module.exports = router;
+export default router

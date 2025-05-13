@@ -1,5 +1,5 @@
-const express = require('express');
-const path = require('path');
+import express from 'express';
+import path from 'path';
 const router = express.Router();
 
 router.get('/file/:filename', (req, res) => {
@@ -15,4 +15,4 @@ router.get('/file/:filename', (req, res) => {
   });
 });
 
-module.exports = router;
+export default router

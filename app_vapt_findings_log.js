@@ -1,7 +1,7 @@
-const express = require('express');
-const { Client } = require('pg');
-const cors = require('cors');
-const authentification = require('./authentification'); 
+import express from 'express';
+import { Client } from 'pg';
+import  cors from 'cors';
+import authentification from './authentification.js'; 
 
 
 const app = express();

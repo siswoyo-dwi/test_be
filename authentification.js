@@ -14,5 +14,5 @@ async function authentification(req, res, next) {
     }
   }
   
-  module.exports = authentification;
+export default authentification
   
