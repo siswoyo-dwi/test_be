@@ -1,7 +1,7 @@
 const express = require('express');
 const { Client } = require('pg');
 const cors = require('cors');
-const config = require('./config');
+const client = require('./config');
 
 const app = express();
 const PORT = 3000;
@@ -13,9 +13,6 @@ const uploadRoute = require('./uploadExcel.js');
 app.use('/upload', uploadRoute);
 const downloadRoute = require('./download.js'); 
 app.use('/download', downloadRoute);
-const client = new Client(config.db);
-
-client.connect();
 
 app.get('/api/event',async (req, res) => {
   try {
