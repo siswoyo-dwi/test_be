@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import pg from 'pg';
+import { ssl } from 'pg/lib/defaults.js';
 
 
 const { Pool } = pg
@@ -12,5 +13,6 @@ const client = new Pool({
     max: 20, 
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000, 
+    ssl:true
   })
 export default client
