@@ -12,9 +12,9 @@ const client = new Pool({
     // max: 20, 
     // idleTimeoutMillis: 30000,
     // connectionTimeoutMillis: 2000
-    connectionString: `postgres://postgres:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB}?sslmode=require`,
+    connectionString: `postgres://postgres:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB}?sslmode=no-verify`,
     ssl: {
-        rejectUnauthorized: false
+        rejectUnauthorized: true
       },
   
   })
