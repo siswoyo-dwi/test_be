@@ -1,6 +1,5 @@
 import 'dotenv/config'
 import pg from 'pg';
-import { ssl } from 'pg/lib/defaults.js';
 
 
 const { Pool } = pg
