@@ -13,6 +13,9 @@ const client = new Pool({
     // idleTimeoutMillis: 30000,
     // connectionTimeoutMillis: 2000
     connectionString: `postgres://postgres:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB}?sslmode=require`,
+    ssl: {
+        rejectUnauthorized: false
+      },
   
   })
 export default client
