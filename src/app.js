@@ -1,22 +1,28 @@
 import 'dotenv/config'
 import express from 'express';
 import cors from 'cors';
-import client from './config.js';
-import authentification from './authentification.js'; 
+import client from './config/config.js';
+import authentification from './moddlewares/authentification.js'; 
 import morgan from 'morgan';
-
-
+import router from'./router.js'
+import bodyParser from 'body-parser';
 const app = express();
-const PORT = 4000;
+const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
 app.use(morgan('combined'))
-app.use(authentification);
+
+app.use(bodyParser.urlencoded({ extended: true }));
 import uploadRoute from './uploadExcel.js'; 
 app.use('/upload', uploadRoute);
 import downloadRoute from './download.js'; 
 app.use('/download', downloadRoute);
+
+app.use('/', router)
+
+
+  // app.use(authentification);
 
 app.get('/api/event',async (req, res) => {
   try {
