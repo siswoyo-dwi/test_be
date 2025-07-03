@@ -4,25 +4,28 @@ import cors from 'cors';
 import client from './config/config.js';
 import authentification from './moddlewares/authentification.js'; 
 import morgan from 'morgan';
-import router from'./router.js'
+import router from './router.js';
 import bodyParser from 'body-parser';
+import apiRoutes from './modules/api/routes.js';
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(morgan('combined'))
-
+app.use(morgan('combined'));
 app.use(bodyParser.urlencoded({ extended: true }));
+
 import uploadRoute from './uploadExcel.js'; 
 app.use('/upload', uploadRoute);
 import downloadRoute from './download.js'; 
 app.use('/download', downloadRoute);
 
-app.use('/', router)
+app.use('/', router);
 
+app.use('/api', apiRoutes);
 
-  // app.use(authentification);
+//app.use(authentification);
 
 app.get('/api/event',async (req, res) => {
   try {
@@ -142,6 +145,9 @@ app.get('/api/ddos-attack-stats',async (req, res) => {
     res.status(500).json({ error: 'Failed to get stats' });
   }
 });
+
 app.listen(PORT, () => {
   console.log(`API server running at http://localhost:${PORT}`);
+  console.log(`API endpoints available at http://localhost:${PORT}/api/`);
 });
+export default app;
